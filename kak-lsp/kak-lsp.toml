@@ -1,0 +1,121 @@
+# kak-lsp.toml — language servers fullstack
+# Destino: ~/.config/kak-lsp/kak-lsp.toml  (instalador.sh lo copia y reemplaza)
+# Referencia: https://github.com/kakoune-lsp/kakoune-lsp
+
+verbosity = 2
+snippet_support = true
+file_watch_support = true
+
+[server]
+timeout = 18000
+
+# ── Web fullstack ────────────────────────────────────────────────────────────
+[language.javascript]
+filetypes = ["javascript", "jsx"]
+roots = ["package.json", ".git"]
+command = "typescript-language-server"
+args = ["--stdio"]
+[language.javascript.settings]
+[language.javascript.settings._]
+"typescript.suggest.completeFunctionCalls" = true
+
+[language.typescript]
+filetypes = ["typescript", "tsx", "vue", "svelte"]
+roots = ["package.json", "tsconfig.json", ".git"]
+command = "typescript-language-server"
+args = ["--stdio"]
+
+[language.html]
+filetypes = ["html"]
+roots = ["package.json", ".git"]
+command = "vscode-html-language-server"
+args = ["--stdio"]
+
+[language.css]
+filetypes = ["css", "scss", "less"]
+roots = ["package.json", ".git"]
+command = "vscode-css-language-server"
+args = ["--stdio"]
+
+[language.json]
+filetypes = ["json"]
+roots = ["package.json", ".git"]
+command = "vscode-json-language-server"
+args = ["--stdio"]
+
+[language.tailwindcss]
+filetypes = ["html", "css", "javascript", "typescript", "tsx", "jsx", "vue", "svelte"]
+roots = ["tailwind.config.js", "tailwind.config.ts", "package.json"]
+command = "tailwindcss-language-server"
+args = ["--stdio"]
+
+[language.eslint]
+filetypes = ["javascript", "typescript", "tsx", "jsx", "vue", "svelte"]
+roots = [".eslintrc", ".eslintrc.js", ".eslintrc.json", "package.json"]
+command = "vscode-eslint-language-server"
+args = ["--stdio"]
+
+# ── Backend / sistemas ───────────────────────────────────────────────────────
+[language.python]
+filetypes = ["python"]
+roots = ["pyproject.toml", "setup.py", "requirements.txt", ".git"]
+command = "pylsp"
+args = []
+# Alternativa rápida: cambiar command a "ruff" con args ["server"] o "pyright-langserver --stdio"
+
+[language.rust]
+filetypes = ["rust"]
+roots = ["Cargo.toml"]
+command = "rust-analyzer"
+
+[language.go]
+filetypes = ["go"]
+roots = ["go.mod", ".git"]
+command = "gopls"
+args = ["serve"]
+
+[language.lua]
+filetypes = ["lua"]
+roots = [".git"]
+command = "lua-language-server"
+
+[language.bash]
+filetypes = ["sh", "bash"]
+roots = [".git"]
+command = "bash-language-server"
+args = ["start"]
+
+[language.c_cpp]
+filetypes = ["c", "cpp"]
+roots = ["compile_commands.json", ".git"]
+command = "clangd"
+args = ["--background-index", "--clang-tidy"]
+
+[language.yaml]
+filetypes = ["yaml"]
+roots = [".git"]
+command = "yaml-language-server"
+args = ["--stdio"]
+
+[language.toml]
+filetypes = ["toml"]
+roots = ["Cargo.toml", "pyproject.toml", ".git"]
+command = "taplo"
+args = ["lsp", "stdio"]
+
+[language.dockerfile]
+filetypes = ["dockerfile"]
+roots = ["Dockerfile", ".git"]
+command = "docker-langserver"
+args = ["--stdio"]
+
+[language.sql]
+filetypes = ["sql"]
+roots = [".git"]
+command = "sqls"
+
+[language.markdown]
+filetypes = ["markdown"]
+roots = [".git"]
+command = "marksman"
+args = ["server"]
