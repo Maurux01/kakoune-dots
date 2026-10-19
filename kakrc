@@ -30,7 +30,8 @@ evaluate-commands %sh{
 }
 
 # ── colores ──────────────────────────────────────────────────────────────────
-try %{ colorscheme fullstack-dark } catch %{ colorscheme default }
+# gruvbox primero (tema pedido), fullstack-dark como fallback
+try %{ colorscheme gruvbox } catch %{ try %{ colorscheme fullstack-dark } catch %{ colorscheme default } }
 
 # ── mensaje de bienvenida ────────────────────────────────────────────────────
 hook global KakBegin .* %{

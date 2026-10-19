@@ -13,6 +13,7 @@
 #   kakrc            -> ~/.config/kak/kakrc
 #   autoload/*.kak   -> ~/.config/kak/autoload/
 #   colors/*.kak     -> ~/.config/kak/colors/
+#   scripts/*.py     -> ~/.config/kak/scripts/  (live server + markdown preview)
 #   plugged/*        -> ~/.config/kak/plugged/ (plug.kak, gestionado por kak)
 #   kak-lsp.toml     -> ~/.config/kak-lsp/kak-lsp.toml
 #   tmux/tmux.conf   -> ~/.config/tmux/tmux.conf (+ ~/.tmux.conf fallback)
@@ -61,18 +62,21 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_KAKRC="$REPO_DIR/kakrc"
 SRC_AUTOLOAD="$REPO_DIR/autoload"
 SRC_COLORS="$REPO_DIR/colors"
+SRC_SCRIPTS="$REPO_DIR/scripts"
 SRC_KAK_LSP="$REPO_DIR/kak-lsp/kak-lsp.toml"
 SRC_TMUX="$REPO_DIR/tmux/tmux.conf"
 
 [ -f "$SRC_KAKRC" ] || die "no se encontró $SRC_KAKRC (¿ejecutas desde el repo?)"
 [ -d "$SRC_AUTOLOAD" ] || die "no se encontró $SRC_AUTOLOAD/"
 [ -d "$SRC_COLORS" ] || die "no se encontró $SRC_COLORS/"
+[ -d "$SRC_SCRIPTS" ] || die "no se encontró $SRC_SCRIPTS/"
 
 # ── destinos ─────────────────────────────────────────────────────────────────
 XDG_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
 DST_KAK_DIR="$XDG_CONFIG/kak"
 DST_AUTOLOAD="$DST_KAK_DIR/autoload"
 DST_COLORS="$DST_KAK_DIR/colors"
+DST_SCRIPTS="$DST_KAK_DIR/scripts"
 DST_KAKRC="$DST_KAK_DIR/kakrc"
 DST_KAK_LSP_DIR="$XDG_CONFIG/kak-lsp"
 DST_KAK_LSP="$DST_KAK_LSP_DIR/kak-lsp.toml"
@@ -149,12 +153,12 @@ is_debian() { [[ "$DISTRO_LIKE" == *"debian"* ]] || [[ "$DISTRO_LIKE" == *"ubunt
 install_pkgs_arch() {
   log "Arch: instalando con pacman…"
   $SUDO pacman -Sy --needed --noconfirm \
-    kakoune tmux git curl fzf ripgrep fd bat \
-    kak-lsp nodejs npm python python-pipx go rust-analyzer \
+    kakoune tmux git curl fzf ripgrep fd bat python pandoc \
+    kak-lsp nodejs npm python-pipx go rust-analyzer \
     shellcheck shfmt lua-language-server bash-language-server \
     yaml-language-server clang pyright eslint 2>/dev/null || {
     warn "algunos paquetes de Arch fallaron; continúo con lo disponible."
-    $SUDO pacman -Sy --needed --noconfirm kakoune tmux git curl fzf ripgrep fd || true
+    $SUDO pacman -Sy --needed --noconfirm kakoune tmux git curl fzf ripgrep fd python pandoc || true
   }
   # LSPs de Node globales (si npm existe)
   if command -v npm >/dev/null 2>&1; then
@@ -180,9 +184,9 @@ install_pkgs_debian() {
   $SUDO apt-get install -y \
     kakoune tmux git curl fzf ripgrep fd-find bat \
     nodejs npm python3 python3-pip pipx golang-go \
-    shellcheck shfmt lua5.4 luarocks yamllint clangd 2>/dev/null || {
+    pandoc shellcheck shfmt lua5.4 luarocks yamllint clangd 2>/dev/null || {
     warn "algunos paquetes apt fallaron; instalo el mínimo."
-    $SUDO apt-get install -y kakoune tmux git curl fzf ripgrep || true
+    $SUDO apt-get install -y kakoune tmux git curl fzf ripgrep python3 pandoc || true
   }
   # kak-lsp rara vez está en repos Debian estables → cargo / binario
   if ! command -v kak-lsp >/dev/null 2>&1 && $WITH_LSP; then
@@ -253,6 +257,8 @@ main() {
   install_file "$SRC_KAKRC" "$DST_KAKRC"
   install_dir "$SRC_AUTOLOAD" "$DST_AUTOLOAD"
   install_dir "$SRC_COLORS" "$DST_COLORS"
+  install_dir "$SRC_SCRIPTS" "$DST_SCRIPTS"
+  chmod 755 "$DST_SCRIPTS"/*.py 2>/dev/null || true
 
   if $WITH_LSP; then
     if [ -f "$SRC_KAK_LSP" ]; then
@@ -307,6 +313,8 @@ main() {
   echo "  plugins:     abre kak y ejecuta  plug-install"
   echo "  LSP:         :lsp-diagnostics  |  <espacio>l (modo lsp)  |  gd/gr/K"
   echo "  tmux en kak: <espacio>t (h/v/w/p/r/s/g)  |  Ctrl-h/j/k/l navega paneles"
+  echo "  tema:        gruvbox  |  powerline: <espacio>u (on/off)"
+  echo "  live server: <espacio>s (toggle)  |  markdown preview: <espacio>v"
   echo "  backups:     *.bak-${STAMP}"
 }
 

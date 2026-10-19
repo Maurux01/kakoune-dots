@@ -72,3 +72,63 @@ plug "andreyorst/kakoune-filetree" defer filetree %{
 plug "andreyorst/smarttab.kak" defer smarttab %{
     set-option global softtabstop 4
 } demand smarttab
+
+# ── powerline: modeline linda con tema gruvbox ──────────────────────────────
+# Nota: el módulo `lsp` de powerline declara `int lsp_diagnostic_error_count`
+# y `int lsp_diagnostic_warning_count`, igual que kak-lsp → mismo tipo, sin
+# conflicto. No hace falta redeclararlas.
+define-command powerline-setup -docstring 'powerline-setup: activa la modeline powerline con tema gruvbox' %{
+    try %{
+        # módulo principal: al cargarse dispara los hooks ModuleLoaded que
+        # cargan los submódulos (bufname, git, lsp, …) y el tema
+        require-module powerline
+
+        # el tema debe ir DESPUÉS del módulo principal: al declararse los
+        # colores, el valor por defecto del módulo principal los pisaría
+        try %{ require-module powerline_gruvbox } catch %{ nop }
+
+        # activar
+        powerline-start
+
+        # tema gruvbox (rc/themes/gruvbox.kak del propio plugin)
+        powerline-theme gruvbox
+
+        # orden de los módulos de la modeline
+        powerline-format global 'git bufname filetype mode_info line_column position lsp'
+
+        # separador: triangle (Nerd Font). Para ASCII: ascii-triangle
+        powerline-separator global triangle
+
+        # nombre de archivo corto
+        set-option global powerline_shorten_bufname short
+
+        # aplicar a los buffers ya abiertos
+        powerline-enable
+    } catch %{
+        echo -debug "powerline: plugin no instalado todavía (corré :plug-install)"
+    }
+}
+
+plug "andreyorst/powerline.kak" config %{
+    powerline-setup
+}
+
+define-command powerline-toggle-safe -docstring 'powerline-toggle-safe: activa/desactiva la powerline' %{
+    try %{ powerline-toggle } catch %{ nop }
+}
+
+# ── render markdown dentro del editor (encabezados, código, listas…) ───────
+plug "kmafeni04/render-markdown.kak" demand render-markdown
+
+hook global WinSetOption filetype=markdown %{
+    try %{
+        require-module render-markdown
+        render-markdown-enable
+    } catch %{ nop }
+}
+
+# ── markdown preview en el navegador (alternativa a md-preview, requiere
+#    `npm install -g livedown`) ──────────────────────────────────────────────
+plug "Delapouite/kakoune-livedown" config %{
+    map global normal <space>o ': livedown-start-with-write-on-idle<ret>' -docstring 'markdown preview (livedown)'
+}

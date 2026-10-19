@@ -31,6 +31,14 @@ map global normal <space>* ': grep <c-r>.<ret>' -docstring 'grep palabra bajo cu
 map global normal <space>G ': tmux-popup lazygit<ret>' -docstring 'lazygit'
 map global normal <space>D ': git diff %val{buffile}<ret>' -docstring 'git diff archivo'
 
+# live server / preview web
+map global normal <space>s ': web-server-toggle<ret>' -docstring 'live server (on/off)'
+map global normal <space>S ': web-server-stop<ret>'     -docstring 'live server: parar'
+map global normal <space>v ': md-preview<ret>'          -docstring 'markdown preview'
+map global normal <space>V ': md-preview-stop<ret>'     -docstring 'markdown preview: parar'
+map global normal <space>u ': powerline-toggle-safe<ret>'  -docstring 'powerline on/off'
+map global normal <space>h ': web-server-start<ret>'    -docstring 'live server: arrancar'
+
 # terminal rápida (respeta tmux: ver 04-tmux.kak)
 map global normal <space>z ': tmux-vsplit<ret>'   -docstring 'terminal split v'
 map global normal <space>Z ': tmux-hsplit<ret>'   -docstring 'terminal split h'
